@@ -6,9 +6,9 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import AddressForm from './form1';
-import PaymentForm from './form2';
-import Review from './form3';
+import DailyForm from './form_daily';
+import WeekendForm from './form_weekend';
+import HolidayForm from './form_holiday';
 
 const useStyles = makeStyles(theme => ({
   layout: {
@@ -46,14 +46,14 @@ const useStyles = makeStyles(theme => ({
 
 const steps = ['Daily Commute', 'Weekend Drives', 'Holiday Plans'];
 
-function getStepContent(step) {
+const getStepContent = step => {
   switch (step) {
     case 0:
-      return <AddressForm />;
+      return <DailyForm />;
     case 1:
-      return <PaymentForm />;
+      return <WeekendForm />;
     case 2:
-      return <Review />;
+      return <HolidayForm />;
     default:
       throw new Error('Unknown step');
   }
