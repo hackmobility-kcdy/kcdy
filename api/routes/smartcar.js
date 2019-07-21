@@ -37,6 +37,7 @@ smartcarRouter.get(`/login`, (req, res) => {
 });
 
 smartcarRouter.get(`/exchange`, function(req, res) {
+  // TODO: store auth code and access token in text files
   const code = req.query.code;
   console.log(code);
   return client.exchangeCode(code).then(function(_access) {
