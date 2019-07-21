@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useReducer, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Stepper from '@material-ui/core/Stepper';
@@ -6,9 +6,46 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import DailyForm from './form_daily';
-import WeekendForm from './form_weekend';
-import HolidayForm from './form_holiday';
+import DailyForm from './form_car';
+import WeekendForm from './form_commute';
+import HolidayForm from './form_preference';
+
+const initialState = {
+  carMake: '',
+  carModel: '',
+  carVIN: '',
+  commuteDays: [], // array of work days
+  commuteStartTime: '',
+  commuteEndTime: '',
+  homeLocation: '',
+  workLocation: '',
+  preference: ''
+}
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_CAR_MAKE':
+      return {...state, carMake: action.payload }
+    case 'SET_CAR_MODEL':
+      return {...state, carModel: action.payload }
+    case 'SET_CAR_VIN':
+      return {...state, carVIN: action.payload }
+    case 'SET_COMMUTE_DAYS':
+      return {...state, commuteDays: action.payload }
+    case 'SET_COMMUTE_STARTTIME':
+      return {...state, commuteStartTime: action.payload }
+    case 'SET_COMMUTE_ENDTIME':
+      return {...state, commuteEndTime: action.payload }
+    case 'SET_LOCATION_HOME':
+      return {...state, homeLocation: action.payload }
+    case 'SET_LOCATION_WORK':
+      return {...state, workLocation: action.payload }
+    default:
+      return state
+  }
+}
+
+const steps = ['Vehicle Information', 'Daily Commute', 'Preference'];
 
 const useStyles = makeStyles(theme => ({
   layout: {
@@ -44,25 +81,37 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const steps = ['Daily Commute', 'Weekend Drives', 'Holiday Plans'];
-
-const getStepContent = step => {
-  switch (step) {
-    case 0:
-      return <DailyForm />;
-    case 1:
-      return <WeekendForm />;
-    case 2:
-      return <HolidayForm />;
-    default:
-      throw new Error('Unknown step');
-  }
-}
-
 const Quetionnaire = () => {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
+  useEffect(() => {
+    console.log('this is state', state)
+  }, [state])
+
+  const getStepContent = step => {
+    switch (step) {
+      case 0:
+        return <DailyForm 
+          state={state}
+          dispatch={dispatch}
+        />;
+      case 1:
+        return <WeekendForm 
+          state={state}
+          dispatch={dispatch}
+        />;
+      case 2:
+        return <HolidayForm 
+          state={state}
+          dispatch={dispatch}
+        />;
+      default:
+        throw new Error('Unknown step');
+    }
+  }
+  
   const handleNext = () => {
     setActiveStep(activeStep + 1);
   };
@@ -70,12 +119,13 @@ const Quetionnaire = () => {
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
+  
 
   return (
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
-            Vehicle Usage
+            Peak Load Shaving
           </Typography>
           <Stepper activeStep={activeStep} className={classes.stepper}>
             {steps.map(label => (
