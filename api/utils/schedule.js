@@ -62,10 +62,13 @@ const calculateChargingSchedule = (utilityProvider, percentRemaining) => {
   let currentBand = getCurrentBand(bands, time);
 
   while (hoursCharged < HOURS_AVAILABLE_TO_CHARGE) {
+    if (!currentBand) break;
     while (
       currentBand === getCurrentBand(bands, time) &&
       hoursCharged < HOURS_AVAILABLE_TO_CHARGE
     ) {
+      console.log("?", currentBand);
+      if (!currentBand) break;
       weights.push({
         start: time,
         end: time + stepSize,

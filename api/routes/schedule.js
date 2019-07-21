@@ -25,27 +25,29 @@ scheduleRouter.post("/", async (req, res) => {
   const {
     body: { vehicleId, utilityProvider }
   } = req;
-  try {
-    const accessToken = await readFileAsync(
-      path.join(__dirname, "../data/access_token"),
-      "utf-8"
-    );
-    const vehicle = await createVehicle(vehicleId, accessToken);
-    const {
-      data: { percentRemaining }
-    } = await vehicle.battery();
-    const chargingSchedule = calculateChargingSchedule(
-      utilityProvider,
-      percentRemaining
-    );
-    /*
+  // try {
+  const accessToken = await readFileAsync(
+    path.join(__dirname, "../data/access_token"),
+    "utf-8"
+  );
+  const vehicle = await createVehicle(vehicleId, accessToken);
+  console.log(vehicle);
+  const {
+    data: { percentRemaining }
+  } = await vehicle.battery();
+  console.log(req.body);
+  const chargingSchedule = calculateChargingSchedule(
+    utilityProvider,
+    percentRemaining
+  );
+  /*
       Here we'd have a way of communicating to our message queue that the vehicle in question
       needs to be told to start/stop charging at these times.
     */
-    res.json(chargingSchedule);
-  } catch (e) {
-    res.json(e);
-  }
+  res.json(chargingSchedule);
+  // } catch (e) {
+  //   res.json(e);
+  // }
 });
 
 module.exports = scheduleRouter;
