@@ -1,23 +1,25 @@
 import React from 'react'
-import { BrowserRouter, Route, Link } from 'react-router-dom'
+import { BrowserRouter, Switch, Route, Link, Redirect } from 'react-router-dom'
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import Button from '@material-ui/core/Button';
 import MomentUtils from '@date-io/moment';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import SignUp from './components/session/SignUp'
 import Login from './components/session/Login'
-import Form from './components/questionnaire/Questionnaire'
+import Questionnaire from './components/questionnaire/Questionnaire'
 
 function App () {
   return (
     <BrowserRouter>
       <MuiPickersUtilsProvider utils={MomentUtils}>
         <CssBaseline />
-        <Form />
-        <br />
-        <Link to='/signup'>Sign Up</Link>
-        <Link to='/login'>Login</Link>
-        <Route path='/signup' component={SignUp} />
-        <Route path='/login' component={Login} />
+          <Button><Link to='/signup'>Sign Up</Link></Button>
+          <Button><Link to='/login'>Login</Link></Button>
+          <Button><Link to='/questionnaire'>Questionnaire</Link></Button>
+
+          <Route path='/signup' component={SignUp} />
+          <Route path='/login' component={Login} />
+          <Route path='/questionnaire' component={Questionnaire} />
       </MuiPickersUtilsProvider>
     </BrowserRouter>
   )

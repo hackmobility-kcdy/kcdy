@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Stepper from '@material-ui/core/Stepper';
@@ -9,6 +9,8 @@ import Typography from '@material-ui/core/Typography';
 import DailyForm from './form_car';
 import WeekendForm from './form_commute';
 import HolidayForm from './form_preference';
+import GridSpinner from './spinner'
+import Summary from './summary'
 
 const initialState = {
   carMake: '',
@@ -85,7 +87,8 @@ const useStyles = makeStyles(theme => ({
 
 const Quetionnaire = () => {
   const classes = useStyles();
-  const [activeStep, setActiveStep] = React.useState(0);
+  const [activeStep, setActiveStep] = useState(0);
+  const [isLoading, setLoading] = useState(true);
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
@@ -143,8 +146,20 @@ const Quetionnaire = () => {
                   Thank you.
                 </Typography>
                 <Typography variant="subtitle1">
-                  We will calculate the optimal schedule for peak load sharing.
+                  { isLoading 
+                  ? 'We will calculate the optimal schedule for peak load sharing.' 
+                  : <p>Go <b style={{ color: 'green' }}>green!</b></p>
+                  }
                 </Typography>
+                { setTimeout(() => setLoading(false), 2500)}
+                
+                <br />
+                
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  { isLoading 
+                    ? <GridSpinner />
+                    : <Summary />}
+                </div>
               </React.Fragment>
             ) : (
               <React.Fragment>

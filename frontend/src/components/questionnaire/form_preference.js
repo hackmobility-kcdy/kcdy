@@ -4,21 +4,7 @@ import Typography from '@material-ui/core/Typography';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 
-const useStyles = makeStyles(theme => ({
-  listItem: {
-    padding: theme.spacing(1, 0),
-  },
-  total: {
-    fontWeight: '700',
-  },
-  title: {
-    marginTop: theme.spacing(2),
-  },
-}));
-
 const PreferenceForm = ({ state, dispatch }) => {
-  const classes = useStyles();
-
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
