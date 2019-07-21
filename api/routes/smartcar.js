@@ -1,84 +1,112 @@
+const path = require("path");
 const express = require("express");
-const smartcar = require("smartcar");
 const smartcarRouter = express.Router();
-
-const client = new smartcar.AuthClient({
-  clientId: process.env.SMARTCAR_CLIENT_ID,
-  clientSecret: process.env.SMARTCAR_CLIENT_SECRET,
-  redirectUri: process.env.SMARTCAR_REDIRECT_URI,
-  scope: [
-    "read_vehicle_info",
-    "read_location",
-    "read_odometer",
-    "control_security",
-    "read_fuel",
-    "read_charge",
-    "read_battery",
-    "control_security",
-    "control_security:unlock",
-    "control_security:lock"
-  ]
-  // testMode: true
-});
-
-const fetchVehicle = async () => {
-  const { vehicles: vehicleIds } = await smartcar.getVehicleIds(
-    process.env.SMARTCAR_ACCESS_TOKEN
-  );
-  return new smartcar.Vehicle(vehicleIds[0], process.env.SMARTCAR_ACCESS_TOKEN);
-};
-
-// TODO: access.accessToken, access.refreshToken
-let access;
+const {
+  client,
+  fetchVehicles,
+  createVehicle,
+  fetchVehicleInfo,
+  exchangeCode,
+  exchangeRefreshToken
+} = require("../utils/smartcar");
+const {
+  readFileAsync,
+  writeFileAsync,
+  appendFileAsync
+} = require("../utils/helpers");
 
 smartcarRouter.get(`/login`, (req, res) => {
   const link = client.getAuthUrl();
   res.redirect(link);
 });
 
-smartcarRouter.get(`/exchange`, function(req, res) {
-  // TODO: store auth code and access token in text files
+smartcarRouter.get(`/exchange`, async (req, res) => {
   const code = req.query.code;
-  console.log(code);
-  return client.exchangeCode(code).then(function(_access) {
-    // in a production app you'll want to store this in some kind of persistent storage
-    access = _access;
-    console.log("access code: ", access);
-
+  try {
+    const access = await exchangeCode(code);
+    await writeFileAsync(
+      path.join(__dirname, "../data/access_token"),
+      access.accessToken
+    );
+    await writeFileAsync(
+      path.join(__dirname, "../data/refresh_token"),
+      access.refreshToken
+    );
     res.sendStatus(200);
-  });
+  } catch (e) {
+    res.sendStatus(400);
+  }
 });
 
-// TODO: have this actually get all vehicle info, currently just gets first vehicle in list
+smartcarRouter.post(`/exchange`, async (req, res) => {
+  try {
+    const access = await exchangeRefreshToken(code);
+    await writeFileAsync(
+      path.join(__dirname, "../data/access_token"),
+      access.accessToken
+    );
+    await writeFileAsync(
+      path.join(__dirname, "../data/refresh_token"),
+      access.refreshToken
+    );
+    res.sendStatus(200);
+  } catch (e) {
+    res.sendStatus(400);
+  }
+});
+
 smartcarRouter.get(`/vehicles`, async (req, res) => {
-  const { vehicles: vehicleIds } = await smartcar.getVehicleIds(
-    process.env.SMARTCAR_ACCESS_TOKEN
-  );
-  const vehicle = new smartcar.Vehicle(
-    vehicleIds[0],
-    process.env.SMARTCAR_ACCESS_TOKEN
-  );
-  const vehicleInfo = await vehicle.info();
-  res.json(vehicleInfo);
+  try {
+    const accessToken = await readFileAsync(
+      path.join(__dirname, "../data/access_token"),
+      "utf-8"
+    );
+    const vehicles = await fetchVehicles(accessToken);
+    res.json(vehicles);
+  } catch (e) {
+    res.json(e);
+  }
 });
 
-smartcarRouter.get(`/vehicle/:id/battery`, async (req, res) => {
-  const { vehicles: vehicleIds } = await smartcar.getVehicleIds(
-    process.env.SMARTCAR_ACCESS_TOKEN
-  );
-  const vehicle = new smartcar.Vehicle(
-    vehicleIds[0],
-    process.env.SMARTCAR_ACCESS_TOKEN
-  );
-  const batteryStatus = await vehicle.battery();
-  res.json(batteryStatus);
+smartcarRouter.get(`/vehicles/:id`, async (req, res) => {
+  const vehicleId = req.params.id;
+  try {
+    const accessToken = await readFileAsync(
+      path.join(__dirname, "../data/access_token"),
+      "utf-8"
+    );
+    const vehicle = await createVehicle(vehicleId, accessToken);
+    const vehicleInfo = await fetchVehicleInfo(vehicle);
+    res.json(vehicleInfo);
+  } catch (e) {
+    res.json(e);
+  }
 });
 
-smartcarRouter.post(`/vehicle/:id/battery`, async (req, res) => {
-  console.log("hand wavey POST for starting/stopping car charge");
+smartcarRouter.get(`/vehicles/:id/battery`, async (req, res) => {
+  const vehicleId = req.params.id;
+  try {
+    const accessToken = await readFileAsync(
+      path.join(__dirname, "../data/access_token"),
+      "utf-8"
+    );
+    const vehicle = await createVehicle(vehicleId, accessToken);
+    const batteryStatus = await vehicle.battery();
+    res.json(batteryStatus);
+  } catch (e) {
+    res.json(e);
+  }
+});
+
+smartcarRouter.post(`/vehicles/:id/battery`, async (req, res) => {
+  /*
+    We would queue requests to this endpoint upon calculated via our
+    scheduling API.
+  */
   res.sendStatus(200);
 });
 
+/*
 smartcarRouter.post(`/vehicle/:id/lock`, async (req, res) => {
   const vehicle = await fetchVehicle();
   const lockStatus = await vehicle.lock();
@@ -90,5 +118,6 @@ smartcarRouter.post(`/vehicle/:id/unlock`, async (req, res) => {
   const unlockStatus = await vehicle.lock();
   res.json(unlockStatus);
 });
+*/
 
 module.exports = smartcarRouter;
