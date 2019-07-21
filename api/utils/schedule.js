@@ -36,7 +36,7 @@ const between = (x, min, max) => x >= min && x < max;
 const getCurrentBand = (bands, time) =>
   bands.find(band => between(time, band.start, band.end));
 
-const calculateChargingSchedule = utilityProvider => {
+const calculateChargingSchedule = (utilityProvider, batteryStatus) => {
   const currentDate = dayjs();
   const currentTime =
     currentDate.hour() + roundToTwo(currentDate.minute() / 100);
@@ -73,6 +73,7 @@ const calculateChargingSchedule = utilityProvider => {
     })
     .slice(0, AVG_CHARGE_TIME);
 
+  // bug in mid-peak logic, could span too much time
   return firstNWeights.reduce((weights_, weight) => {
     const [weight_] = weights_.filter(
       weight_ => weight_.coefficient === weight.coefficient
@@ -91,6 +92,11 @@ const calculateChargingSchedule = utilityProvider => {
     return weights_;
   }, []);
 };
+
+const result = calculateChargingSchedule("PG&E");
+console.log(result);
+
+// NOTE: in code to actually charge, have some of way checking at beginning what charge state is, and also during
 
 // TODO: consider this optimization
 // let timeOfCharge = currentDate.clone();
