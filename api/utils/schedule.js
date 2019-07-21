@@ -1,5 +1,4 @@
 const dayjs = require("dayjs");
-const groupBy = require("lodash.groupby");
 
 const utilityProviderMap = {
   "PG&E": {
@@ -93,8 +92,9 @@ const calculateChargingSchedule = (utilityProvider, batteryStatus) => {
   }, []);
 };
 
-const result = calculateChargingSchedule("PG&E");
-console.log(result);
+module.exports = {
+  calculateChargingSchedule
+};
 
 // NOTE: in code to actually charge, have some of way checking at beginning what charge state is, and also during
 
