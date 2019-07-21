@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const PreferenceForm = props => {
+const PreferenceForm = ({ state, dispatch }) => {
   const classes = useStyles();
 
   return (
@@ -30,6 +30,7 @@ const PreferenceForm = props => {
             <Checkbox
               value="electricity"
               color="primary"
+              onChange={() => dispatch({ type: 'SET_PREFERENCE', payload: 'electricity' })}
             />
           }
           label="Minimize Electricty Cost"
@@ -40,6 +41,7 @@ const PreferenceForm = props => {
             <Checkbox
               value="carbon"
               color="primary"
+              onChange={() => dispatch({ type: 'SET_PREFERENCE', payload: 'carbon' })}
             />
           }
           label="Minimize Carbon Footprint"
@@ -50,6 +52,7 @@ const PreferenceForm = props => {
             <Checkbox
               value="accessibility"
               color="primary"
+              onChange={() => dispatch({ type: 'SET_PREFERENCE', payload: 'accessibility' })}
             />
           }
           label="EV Accessibility"

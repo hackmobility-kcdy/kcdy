@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
 import Typography from '@material-ui/core/Typography';
+import TextField from '@material-ui/core/TextField';
 
 const carMakeOptions = [
   { value: 'Audi', label: 'Audi' },
@@ -19,9 +20,6 @@ const carModelOptions = [
 ]
 
 const CarForm = ({ state, dispatch }) => {
-  const [ carMake, setCarMake ] = useState('')
-  const [ carModel, setCarModel ] = useState('')
-
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
@@ -33,7 +31,7 @@ const CarForm = ({ state, dispatch }) => {
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <h4>Car Make</h4>
-        <div style={{ width: '15px' }}/>
+        <div style={{ width: '25px' }}/>
         <div style={{ width: '150px' }}>
           <Select 
             value={{ label: state.carMake}}
@@ -47,12 +45,26 @@ const CarForm = ({ state, dispatch }) => {
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <h4>Car Model</h4>
-        <div style={{ width: '15px' }}/>
+        <div style={{ width: '25px' }}/>
         <div style={{ width: '150px' }}>
           <Select 
             value={{ label: state.carModel}}
             onChange={choice => dispatch({ type: 'SET_CAR_MODEL', payload: choice.value })}
             options={carModelOptions}
+          />
+        </div>
+      </div>
+
+      <br />
+
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <h4>Car VIN</h4>
+        <div style={{ width: '45px' }}/>
+        <div style={{ width: '150px' }}>
+          <TextField
+            label="Enter vehicle ID"
+            value={state.carVIN}
+            onChange={e => dispatch({ type: 'SET_CAR_VIN', payload: e.target.value })}
           />
         </div>
       </div>

@@ -15,8 +15,8 @@ const initialState = {
   carModel: '',
   carVIN: '',
   commuteDays: [], // array of work days
-  commuteStartTime: '',
-  commuteEndTime: '',
+  commuteStartTime: '2019-07-21T00:00:00.000Z',
+  commuteEndTime: '2019-07-21T00:00:00.000Z',
   homeLocation: '',
   workLocation: '',
   preference: ''
@@ -40,6 +40,8 @@ const reducer = (state, action) => {
       return {...state, homeLocation: action.payload }
     case 'SET_LOCATION_WORK':
       return {...state, workLocation: action.payload }
+    case 'SET_PREFERENCE':
+        return {...state, preference: action.payload }
     default:
       return state
   }

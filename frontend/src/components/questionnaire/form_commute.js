@@ -5,12 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
 
-const CommuteForm = props => {
-  const [ startTime, setStartTime ] = useState('2019-07-21T00:00:00.000Z');
-  const [ endTime, setEndTime ] = useState('2019-07-21T00:00:00.000Z');
-  const [ home, setHome ] = useState('');
-  const [ work, setWork ] = useState('');
-
+const CommuteForm = ({ state, dispatch }) => {
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
@@ -21,13 +16,13 @@ const CommuteForm = props => {
       
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <ButtonGroup size="medium">
-          <Button>Mon</Button>
-          <Button>Tue</Button>
-          <Button>Wed</Button>
-          <Button>Thu</Button>
-          <Button>Fri</Button>
-          <Button>Sat</Button>
-          <Button>Sun</Button>
+          <Button onClick={() => dispatch({ type: 'SET_COMMUTE_DAYS', payload: [...state.commuteDays, '1']})}>Mon</Button>
+          <Button onClick={() => dispatch({ type: 'SET_COMMUTE_DAYS', payload: [...state.commuteDays, '2']})}>Tue</Button>
+          <Button onClick={() => dispatch({ type: 'SET_COMMUTE_DAYS', payload: [...state.commuteDays, '3']})}>Wed</Button>
+          <Button onClick={() => dispatch({ type: 'SET_COMMUTE_DAYS', payload: [...state.commuteDays, '4']})}>Thu</Button>
+          <Button onClick={() => dispatch({ type: 'SET_COMMUTE_DAYS', payload: [...state.commuteDays, '5']})}>Fri</Button>
+          <Button onClick={() => dispatch({ type: 'SET_COMMUTE_DAYS', payload: [...state.commuteDays, '6']})}>Sat</Button>
+          <Button onClick={() => dispatch({ type: 'SET_COMMUTE_DAYS', payload: [...state.commuteDays, '7']})}>Sun</Button>
         </ButtonGroup>
       </div>
 
@@ -39,8 +34,8 @@ const CommuteForm = props => {
           <TimePicker
             autoOk
             variant="inline"
-            value={startTime}
-            onChange={setStartTime}
+            value={state.startTime}
+            onChange={e => dispatch({ type: 'SET_COMMUTE_STARTTIME', payload: e._d })}
           />
         </div>
         
@@ -51,8 +46,8 @@ const CommuteForm = props => {
           <TimePicker
             autoOk
             variant="inline"
-            value={endTime}
-            onChange={setEndTime}
+            value={state.endTime}
+            onChange={e => dispatch({ type: 'SET_COMMUTE_ENDTIME', payload: e._d })}
           />
         </div>
       </div>
@@ -65,8 +60,8 @@ const CommuteForm = props => {
         <div style={{ width: '15px' }} />
         <TextField
           label="Address"
-          value={home}
-          onChange={e => setHome(e.target.value)}
+          value={state.homeLocation}
+          onChange={e => dispatch({ type: 'SET_LOCATION_HOME', payload: e.target.value })}
           margin="normal"
           variant="outlined"
         />
@@ -77,8 +72,8 @@ const CommuteForm = props => {
         <div style={{ width: '15px' }} />
         <TextField
           label="Address"
-          value={work}
-          onChange={e => setWork(e.target.value)}
+          value={state.workLocation}
+          onChange={e => dispatch({ type: 'SET_LOCATION_WORK', payload: e.target.value })}
           margin="normal"
           variant="outlined"
         />
