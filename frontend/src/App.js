@@ -10,13 +10,22 @@ import SignUp from "./components/session/SignUp";
 import Login from "./components/session/Login";
 import Questionnaire from "./components/questionnaire/Questionnaire";
 import { login } from "./lib/api";
-
+const VehicleInfo = ({ percentRemaining }) => {
+  console.log(percentRemaining);
+  return <div>{percentRemaining}</div>;
+};
 class App extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      loading: false,
+      percentRemaining: null
+    };
     this.authorize = this.authorize.bind(this);
 
     this.onComplete = this.onComplete.bind(this);
+
+    this.getVehicleData = this.getVehicleData.bind(this);
 
     this.smartcar = new Smartcar({
       clientId: "2ea2b139-4ca0-47c5-a977-899d127e3acf",
@@ -40,14 +49,25 @@ class App extends Component {
   }
 
   onComplete(err, code, status) {
+    this.setState({ loading: true });
     return axios
       .get(`api/smartcar/exchange?code=${code}`)
       .then(res => {
-        // return axios.get(`${process.env.REACT_APP_SERVER}/vehicle`);
-        console.log(res);
+        this.setState({ loading: false });
+      })
+      .catch(e => console.log(e));
+  }
+
+  getVehicleData() {
+    return axios
+      .get(`api/smartcar/vehicles`)
+      .then(res => {
+        const vid = res.data.vehicles[0];
+        return axios.get(`api/smartcar/vehicles/${vid}/battery`);
       })
       .then(res => {
-        // this.setState({vehicle: res.data});
+        console.log(res.data.data.percentRemaining);
+        this.setState({ percentRemaining: res.data.data.percentRemaining });
       });
   }
 
@@ -69,11 +89,26 @@ class App extends Component {
           <Button>
             <Link to="/questionnaire">Questionnaire</Link>
           </Button>
+          {this.state.loading ? null : (
+            <Button>
+              <Link to="/vehicle-info">VehicleInfo</Link>
+            </Button>
+          )}
+
           <Button onClick={this.authorize}>Connect to Car</Button>
+          {this.state.loading ? null : (
+            <Button onClick={this.getVehicleData}>Get Vehicle Info</Button>
+          )}
 
           <Route path="/signup" component={SignUp} />
           <Route path="/login" component={Login} />
           <Route path="/questionnaire" component={Questionnaire} />
+          <Route
+            path="/vehicle-info"
+            component={() => (
+              <VehicleInfo percentRemaining={this.state.percentRemaining} />
+            )}
+          />
         </MuiPickersUtilsProvider>
       </BrowserRouter>
     );
