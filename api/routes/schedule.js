@@ -31,10 +31,12 @@ scheduleRouter.post("/", async (req, res) => {
       "utf-8"
     );
     const vehicle = await createVehicle(vehicleId, accessToken);
-    const batteryStatus = await vehicle.battery();
+    const {
+      data: { percentRemaining }
+    } = await vehicle.battery();
     const chargingSchedule = calculateChargingSchedule(
       utilityProvider,
-      batteryStatus
+      percentRemaining
     );
     /*
       Here we'd have a way of communicating to our message queue that the vehicle in question

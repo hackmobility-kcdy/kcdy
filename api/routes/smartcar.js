@@ -100,8 +100,8 @@ smartcarRouter.get(`/vehicles/:id/battery`, async (req, res) => {
 
 smartcarRouter.post(`/vehicles/:id/battery`, async (req, res) => {
   /*
-    We would queue requests to this endpoint upon calculated via our
-    scheduling API.
+    We would queue requests to this endpoint after the charging schedules
+     is calculated by our scheduling API.
   */
   res.sendStatus(200);
 });
