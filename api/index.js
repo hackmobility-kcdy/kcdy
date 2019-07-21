@@ -10,7 +10,6 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "../frontend/build")));
 
 const { BASE_URI } = require("./CONSTANTS");
-app.use(express.static(path.join(__dirname, "../frontend/build")));
 const { smartcarRouter, scheduleRouter } = require("./routes");
 
 app.use(bodyParser.json());
