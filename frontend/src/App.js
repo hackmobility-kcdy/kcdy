@@ -34,7 +34,7 @@ class App extends Component {
         "control_security:unlock",
         "control_security:lock"
       ],
-      // testMode: true,
+      testMode: true,
       onComplete: this.onComplete
     });
   }

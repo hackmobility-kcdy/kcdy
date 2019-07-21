@@ -15,8 +15,8 @@ const client = new smartcar.AuthClient({
     "control_security",
     "control_security:unlock",
     "control_security:lock"
-  ]
-  // testMode: true
+  ],
+  testMode: true
 });
 
 const fetchVehicles = async accessToken =>
