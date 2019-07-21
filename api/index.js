@@ -1,9 +1,13 @@
 require("dotenv").config();
 const path = require("path");
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const bodyParser = require("body-parser");
 const PORT = 3000;
+
+app.use(cors());
+app.use(express.static(path.join(__dirname, "../frontend/build")));
 
 const { BASE_URI } = require("./CONSTANTS");
 app.use(express.static(path.join(__dirname, "../frontend/build")));
