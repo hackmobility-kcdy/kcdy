@@ -10,22 +10,39 @@ import SignUp from "./components/session/SignUp";
 import Login from "./components/session/Login";
 import Questionnaire from "./components/questionnaire/Questionnaire";
 import { login } from "./lib/api";
-const VehicleInfo = ({ percentRemaining }) => {
+import { Progress } from "react-sweet-progress";
+import "react-sweet-progress/lib/style.css";
+
+const VehicleInfo = ({ percentRemaining, schedule }) => {
   console.log(percentRemaining);
-  return <div>{percentRemaining}</div>;
+  const battery = percentRemaining * 100;
+  return (
+    <div style={{ display: "flex", justifyContent: "center", width: "500px" }}>
+      <h1>{`Battery Charge Status: ${battery}%`}</h1>
+      <Progress percent={battery} status="success" />
+    </div>
+  );
+};
+
+const ScheduleInfo = ({ schedule }) => {
+  return <div>{JSON.stringify(schedule)}</div>;
 };
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       loading: false,
-      percentRemaining: null
+      percentRemaining: null,
+      vehicleId: "",
+      schedule: ""
     };
     this.authorize = this.authorize.bind(this);
 
     this.onComplete = this.onComplete.bind(this);
 
     this.getVehicleData = this.getVehicleData.bind(this);
+
+    this.getSchedule = this.getSchedule.bind(this);
 
     this.smartcar = new Smartcar({
       clientId: "2ea2b139-4ca0-47c5-a977-899d127e3acf",
@@ -63,12 +80,27 @@ class App extends Component {
       .get(`api/smartcar/vehicles`)
       .then(res => {
         const vid = res.data.vehicles[0];
+        this.setState({ vehicleId: vid });
         return axios.get(`api/smartcar/vehicles/${vid}/battery`);
       })
       .then(res => {
         console.log(res.data.data.percentRemaining);
         this.setState({ percentRemaining: res.data.data.percentRemaining });
       });
+  }
+
+  getSchedule() {
+    console.log("get schedule", this.state.vehicleId);
+    return axios
+      .post("api/schedule", {
+        vehicleId: this.state.vehicleId,
+        utilityProvider: "PG&E"
+      })
+      .then(res => {
+        console.log("this is schedule", res.data);
+        this.setState({ schedule: res.data[0] });
+      })
+      .catch(err => console.log("this is err", err));
   }
 
   authorize() {
@@ -95,9 +127,18 @@ class App extends Component {
             </Button>
           )}
 
+          {this.state.loading ? null : (
+            <Button>
+              <Link to="/schedule-info">ScheduleInfo</Link>
+            </Button>
+          )}
+
           <Button onClick={this.authorize}>Connect to Car</Button>
           {this.state.loading ? null : (
-            <Button onClick={this.getVehicleData}>Get Vehicle Info</Button>
+            <div>
+              <Button onClick={this.getVehicleData}>Get Vehicle Info</Button>
+              <Button onClick={this.getSchedule}>Get Schedule</Button>
+            </div>
           )}
 
           <Route path="/signup" component={SignUp} />
@@ -106,8 +147,15 @@ class App extends Component {
           <Route
             path="/vehicle-info"
             component={() => (
-              <VehicleInfo percentRemaining={this.state.percentRemaining} />
+              <VehicleInfo
+                percentRemaining={this.state.percentRemaining}
+                // schedule={this.state.schedule}
+              />
             )}
+          />
+          <Route
+            path="/schedule-info"
+            component={() => <ScheduleInfo schedule={this.state.schedule} />}
           />
         </MuiPickersUtilsProvider>
       </BrowserRouter>
